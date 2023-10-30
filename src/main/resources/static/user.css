@@ -1,0 +1,68 @@
+
+.head {
+    margin: unset;
+    background: #343a40;
+}
+
+.head .col div, .head b {
+    font-size: 20px;
+    color: white;
+    float: left;
+    margin-left: 10px;
+    margin-bottom: unset;
+}
+
+#rolesInfo {
+    margin-left: unset;
+}
+
+.head a {
+    text-decoration: none;
+    float: right;
+    color: grey;
+    margin-top: 4px;
+}
+
+.head .row {
+    padding-bottom: 7px;
+}
+
+.user {
+    text-decoration: none;
+    color: white;
+    background: #007bff;
+    display: block;
+    border-radius: 5px;
+    padding: 9px 14px;
+}
+
+.admin {
+    text-decoration: none;
+    color: #007bff;
+    background: white;
+    display: block;
+    border-radius: 5px;
+    padding: 9px 14px;
+}
+
+.body .col-2 {
+    padding: unset;
+    height: 100vh;
+}
+
+.body .col {
+    width: max-content;
+}
+
+.body .col h1 {
+    margin: 14px 0 14px 14px;
+}
+
+table {
+    margin-top: 16px;
+}
+
+#rolesInfo2 div {
+    float: left;
+    margin-right: 10px
+}
