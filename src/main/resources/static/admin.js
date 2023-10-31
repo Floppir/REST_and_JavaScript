@@ -50,6 +50,8 @@ document.getElementById('formElem').addEventListener('submit', (e) => {
     })
         .then((response) => {
             if (response.ok) {
+                const outputDiv = document.getElementById("outputNew");
+                outputDiv.innerHTML = '';
                 document.getElementById('firstNameNew').value = '';
                 document.getElementById('lastNameNew').value = '';
                 document.getElementById('ageNew').value = '';
@@ -63,7 +65,7 @@ document.getElementById('formElem').addEventListener('submit', (e) => {
                     outputDiv.innerHTML = '';
                     violation.violations.forEach((violation) => {
                         const p = document.createElement("p");
-                        p.innerHTML = `${violation.fieldName}: ${violation.message}`;
+                        p.innerHTML = `${violation.message}`;
                         outputDiv.appendChild(p);
                     });
                 })
@@ -81,6 +83,7 @@ function getAllUsers() {
         })
 }
 
+// <----------------------Load Table in Admin Page---------------------->
 function loadTable(listAllUsers) {
     let res = ``;
 
@@ -97,7 +100,7 @@ function loadTable(listAllUsers) {
         for (let role of user.roles) {
             res += `<div style="float: left; margin-right: 10px">` + role.name + `</div>`
         }
-        res +=  `<td>
+        res += `<td>
                     <button id="button-edit" class="btn btn-sm btn-primary" type="button"
                     data-bs-toggle="modal" data-bs-target="#editModel"
                     onclick="editModal(${user.id})">Edit</button></td>
@@ -111,13 +114,13 @@ function loadTable(listAllUsers) {
 
 }
 
-function roles(role) {
-    return `<div>` + role.name + `</div>`
-}
+// <----------------------Close Modal Function---------------------->
 
 function closeModal() {
     document.querySelectorAll(".btn-close").forEach((btn) => btn.click())
 }
+
+// <----------------------Load data User in EditModal---------------------->
 
 function editModal(id) {
     const url = '/getUser';
@@ -140,6 +143,7 @@ function editModal(id) {
 
 }
 
+// <----------------------Edit User Form---------------------->
 async function editUser() {
     let idValue = document.getElementById('editId').value;
     let firstNameValue = document.getElementById('editFirstName').value;
@@ -147,21 +151,33 @@ async function editUser() {
     let ageValue = document.getElementById('editAge').value;
     let emailValue = document.getElementById('editEmail').value;
     let passwordValue = document.getElementById('editPassword').value;
-    let user = {
-        id: idValue,
-        firstName: firstNameValue,
-        lastName: lastNameValue,
-        age: ageValue,
-        email: emailValue,
-        password: passwordValue,
-        roles: [
-            {
-                id: document.getElementById('editRoles').value
-            }
-        ]
+    let user = '';
+    if (document.getElementById('editRoles').value === '') {
+        user = {
+            id: idValue,
+            firstName: firstNameValue,
+            lastName: lastNameValue,
+            age: ageValue,
+            email: emailValue,
+            password: passwordValue,
+            roles: null
+        }
+    } else {
+        user = {
+            id: idValue,
+            firstName: firstNameValue,
+            lastName: lastNameValue,
+            age: ageValue,
+            email: emailValue,
+            password: passwordValue,
+            roles: [
+                {
+                    id: document.getElementById('editRoles').value
+                }
+            ]
+        }
     }
-
-    let url ='/edit_user';
+    let url = '/edit_user';
     await fetch(`${url}/${idValue}`, {
         method: 'PATCH',
         headers: {
@@ -169,11 +185,26 @@ async function editUser() {
             'Content-Type': 'application/json;charset=UTF-8'
         },
         body: JSON.stringify(user)
+    }).then((response) => {
+        if (response.ok) {
+            closeModal()
+            getAllUsers()
+        } else {
+            response.json().then(violation => {
+                const outputDiv = document.getElementById("outputEdit");
+                outputDiv.innerHTML = '';
+                violation.violations.forEach((violation) => {
+                    const p = document.createElement("p");
+                    p.innerHTML = `${violation.message}`;
+                    outputDiv.appendChild(p);
+                });
+            })
+        }
     })
-    closeModal()
-    getAllUsers()
+
 }
 
+// <----------------------Load data User in DeleteModal---------------------->
 function deleteModal(id) {
     const url = '/getUser'
     let delId = `${url}/${id}`;
@@ -193,6 +224,7 @@ function deleteModal(id) {
     });
 }
 
+// <----------------------Delete User Form---------------------->
 async function deleteUser() {
     const id = document.getElementById('deleteID').value
     const url = '/delete_user'

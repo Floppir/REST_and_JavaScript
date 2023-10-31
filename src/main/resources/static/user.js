@@ -4,7 +4,7 @@ fetch('/userInfo')
         document.getElementById('userEmail').innerHTML = userJSON.email;
         let html = '';
         userJSON.roles.forEach(function (elem) {
-                html += '<div>' + elem.name + '</div>';
+            html += '<div>' + elem.name + '</div>';
         });
         document.getElementById('rolesInfo').innerHTML = html;
         document.getElementById('rolesInfo2').innerHTML = html;

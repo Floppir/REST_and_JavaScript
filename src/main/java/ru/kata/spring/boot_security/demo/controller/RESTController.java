@@ -11,8 +11,12 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class RESTController {
@@ -21,10 +25,13 @@ public class RESTController {
 
     private final RoleService roleService;
 
+    private final Validator validator;
+
     @Autowired
-    public RESTController(UserServiceImpl userService, RoleService roleService) {
+    public RESTController(UserServiceImpl userService, RoleService roleService, Validator validator) {
         this.userService = userService;
         this.roleService = roleService;
+        this.validator = validator;
     }
 
     @GetMapping(value = "/userInfo")
@@ -46,6 +53,10 @@ public class RESTController {
 
     @PostMapping("/save_user")
     public ResponseEntity<?> saveUser(@RequestBody User user) {
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         userService.save(user);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -53,6 +64,11 @@ public class RESTController {
 
     @PatchMapping("/edit_user/{id}")
     public ResponseEntity<?> editUser(@RequestBody User user) {
+        System.out.println(user.getRoles());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         if (user.getPassword() == null) {
             user.setPassword(userService.findById(user.getId()).getPassword());
         }
