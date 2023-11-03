@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.service;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,12 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new EmptyResultDataAccessException(1);
+        } else {
+            return users;
+        }
     }
 
     @Transactional
@@ -69,7 +75,11 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new EntityNotFoundException("Пользователь с данным email не найден");
+        }
+        return user;
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +89,7 @@ public class UserServiceImpl implements UserService {
         if (user.isPresent()) {
             return user.get();
         } else {
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException("Пользователь с данным id не найден");
         }
     }
 
